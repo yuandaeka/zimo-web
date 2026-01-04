@@ -151,7 +151,7 @@ const AWARDS_DATA = [
   { title: "Best AI Implementation", category: "Google DevFest", img: "https://images.unsplash.com/photo-1496469888073-80de7e952517?w=400&q=80" },
 ];
 
-// --- KOMPONEN HELPER ---
+// --- KOMPONEN HELPER (HUD) ---
 const GameHUD = () => (
   <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mb-8 w-full max-w-lg bg-white/60 backdrop-blur-md p-3 rounded-2xl border-[3px] border-zimo-dark shadow-comic relative z-20">
     <div className="absolute -top-3 -right-3 bg-zimo-yellow border-2 border-zimo-dark rounded-full p-1 shadow-sm animate-bounce">
@@ -184,23 +184,9 @@ const GameHUD = () => (
   </div>
 );
 
+// --- KOMPONEN: KARAKTER ZIMO (VIDEO VERSION) ---
+// Ini yang sudah diganti ke VIDEO
 const ZimoCharacter = ({ lang }) => {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-      const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-      setMousePos({ x, y });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  const faceX = mousePos.x * 15;
-  const faceY = mousePos.y * 10;
-  const bodyRotate = mousePos.x * 10;
-
   return (
     <div className="relative w-80 h-80 flex items-center justify-center">
       {/* Speech Bubble */}
@@ -213,32 +199,38 @@ const ZimoCharacter = ({ lang }) => {
         </p>
       </motion.div>
 
-      {/* Floating Elements */}
-      <motion.div animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -top-10 -left-10 text-4xl drop-shadow-md z-0">🥦</motion.div>
-      <motion.div animate={{ y: [0, 25, 0], rotate: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, delay: 1 }} className="absolute bottom-10 -right-12 text-4xl drop-shadow-md z-0">🍎</motion.div>
-      <motion.div animate={{ scale: [1, 1.2, 1], rotate: [-10, 10, -10] }} transition={{ duration: 2, repeat: Infinity }} className="absolute top-1/2 -left-20 text-3xl z-0">💖</motion.div>
-      <motion.div animate={{ scale: [1, 1.2, 1], rotate: [10, -10, 10] }} transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }} className="absolute top-0 right-0 text-3xl z-0">✨</motion.div>
+      {/* Floating Elements (Brokoli, Apel, Love) */}
+      <motion.div animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -top-10 -left-10 text-4xl drop-shadow-md z-10">🥦</motion.div>
+      <motion.div animate={{ y: [0, 25, 0], rotate: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, delay: 1 }} className="absolute bottom-10 -right-12 text-4xl drop-shadow-md z-10">🍎</motion.div>
+      <motion.div animate={{ scale: [1, 1.2, 1], rotate: [-10, 10, -10] }} transition={{ duration: 2, repeat: Infinity }} className="absolute top-1/2 -left-20 text-3xl z-10">💖</motion.div>
 
-      {/* BODY */}
-      <motion.div style={{ rotate: bodyRotate }} className="relative w-56 h-64 z-10">
-        <motion.div animate={{ rotate: [0, 20, 0] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute top-24 -left-6 w-12 h-12 bg-[#A5F3FC] border-[4px] border-zimo-dark rounded-full shadow-sm z-0"/>
-        <div className="absolute top-24 -right-6 w-12 h-12 bg-[#A5F3FC] border-[4px] border-zimo-dark rounded-full shadow-sm z-0"></div>
-        <div className="absolute bottom-0 left-6 w-14 h-16 bg-[#A5F3FC] border-[4px] border-zimo-dark rounded-b-3xl z-0"></div>
-        <div className="absolute bottom-0 right-6 w-14 h-16 bg-[#A5F3FC] border-[4px] border-zimo-dark rounded-b-3xl z-0"></div>
-        <div className="absolute inset-0 bg-[#A5F3FC] border-[4px] border-zimo-dark rounded-[40%] shadow-[inset_-15px_-10px_20px_rgba(0,128,128,0.1)] flex items-center justify-center overflow-hidden z-10">
-           <motion.div animate={{ x: faceX, y: faceY }} className="flex flex-col items-center gap-3 mt-4">
-              <div className="flex gap-8">
-                 <div className="w-4 h-4 bg-zimo-dark rounded-full"></div>
-                 <div className="w-4 h-4 bg-zimo-dark rounded-full"></div>
-              </div>
-              <div className="relative flex items-center justify-center">
-                 <div className="absolute -left-8 top-0 w-6 h-3 bg-pink-300 rounded-full opacity-60 blur-[1px]"></div>
-                 <div className="absolute -right-8 top-0 w-6 h-3 bg-pink-300 rounded-full opacity-60 blur-[1px]"></div>
-                 <div className="w-6 h-3 border-b-[3px] border-zimo-dark rounded-full"></div>
-              </div>
-           </motion.div>
-           <div className="absolute top-4 right-10 w-10 h-6 bg-white opacity-40 rounded-full rotate-[-20deg]"></div>
+      {/* CONTAINER VIDEO (Gaya Desain Zimo) */}
+      <motion.div 
+        animate={{ y: [0, -15, 0] }} // Animasi Melayang Halus
+        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+        className="relative w-64 h-64 z-20"
+      >
+        {/* Bingkai Video */}
+        <div className="w-full h-full rounded-[40%] overflow-hidden border-[5px] border-zimo-dark shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.1)] bg-[#A5F3FC] relative">
+           {/* VIDEO ELEMENT */}
+           <video 
+             autoPlay 
+             loop 
+             muted 
+             playsInline 
+             className="w-full h-full object-cover transform scale-110" 
+           >
+              {/* Pastikan file zimo-video.mp4 ada di folder PUBLIC */}
+              <source src="/zimo-video.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+           </video>
+           
+           {/* Efek Kilau */}
+           <div className="absolute top-4 right-8 w-12 h-6 bg-white opacity-30 rounded-full rotate-[-20deg] pointer-events-none"></div>
         </div>
+
+        {/* Bayangan Bawah */}
+        <div className="absolute -bottom-8 left-10 right-10 h-4 bg-zimo-dark/20 rounded-[100%] blur-sm"></div>
       </motion.div>
     </div>
   );
@@ -278,13 +270,21 @@ function App() {
       {/* NAVBAR */}
       <nav className="fixed w-full z-50 top-4 px-4">
         <div className="max-w-6xl mx-auto bg-white/95 backdrop-blur-md border-[3px] border-zimo-dark rounded-full px-6 py-3 flex justify-between items-center shadow-comic">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-zimo-primary rounded-full border-[3px] border-zimo-dark flex items-center justify-center font-display font-bold text-xl relative overflow-hidden group">
-               <span className="relative z-10 group-hover:scale-110 transition">Z</span>
-               <div className="absolute inset-0 bg-yellow-300 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+          
+          {/* BAGIAN LOGO (SUDAH DIGANTI GAMBAR) */}
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 relative group cursor-pointer">
+               {/* Pastikan file zimo-logo.png ada di folder PUBLIC */}
+               <img 
+                 src="/zimo-logo.png" 
+                 alt="Zimo Logo" 
+                 className="w-full h-full object-contain drop-shadow-sm group-hover:scale-110 transition duration-300"
+               />
+               <div className="absolute inset-0 bg-yellow-300 rounded-full -z-10 scale-0 group-hover:scale-75 transition duration-300"></div>
             </div>
             <span className="text-2xl font-display font-bold tracking-tight">Zimo<span className="text-zimo-main">.id</span></span>
           </div>
+
           <div className="hidden lg:flex gap-8 font-bold text-sm items-center">
             <a href="#beranda" className="hover:text-zimo-main hover:scale-105 transition flex items-center gap-1">{t.nav.home}</a>
             <a href="#about" className="hover:text-zimo-main hover:scale-105 transition flex items-center gap-1">{t.nav.about}</a>

@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ShoppingBag, ScanLine, Users, Award, Star, Heart, Zap, ShieldCheck, Gamepad2, ArrowRight, Globe, MessageCircle, Mail, Phone, MapPin, Trophy, Download } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShoppingBag, ScanLine, Users, Award, Star, Heart, Zap, ShieldCheck, Gamepad2, ArrowRight, Globe, MessageCircle, Mail, Phone, MapPin, Trophy, Download, Play, X } from 'lucide-react';
 
-// --- KONFIGURASI LINK DOWNLOAD ---
-// GANTI LINK INI DENGAN LINK GOOGLE DRIVE APLIKASI ANDA YANG ASLI
+// --- KONFIGURASI LINK ---
 const DOWNLOAD_LINK = "https://drive.google.com/drive/folders/1xMF60xhMf0wj8YwFb3Vzhjhtz7QaEqkD?usp=drive_link"; 
+const TELEGRAM_LINK = "https://t.me/+hynphcWyciE2ZTE1"; // LINK TELEGRAM BARU
 
 // --- KAMUS BAHASA (DICTIONARY) ---
 const TRANSLATIONS = {
   id: {
-    nav: { home: "Beranda", about: "Tentang", features: "Fitur", quest: "Misi", market: "Pasar", play: "Mainkan!" },
+    // SAYA TAMBAHKAN 'community' DI SINI AGAR MUNCUL DI FOOTER/NAV
+    nav: { home: "Beranda", about: "Tentang", features: "Fitur", quest: "Misi", market: "Pasar", community: "Komunitas", play: "Mainkan!" },
     hero: {
       badge: "#1 Aplikasi Kesehatan Gamifikasi",
       title_1: "Cegah Malnutrisi",
       title_2: "Sambil Seru-seruan!",
-      desc: "Aplikasi kesehatan berstandar internasional dengan AI Gemini. Yuk dukung SDGs Zero Hunger bareng Zimo!",
+      desc: "Aplikasi kesehatan berstandar internasional dengan AI. Yuk dukung SDGs Zero Hunger bareng Zimo!",
       btn_start: "Download App",
       btn_demo: "Lihat Demo"
     },
@@ -40,7 +41,7 @@ const TRANSLATIONS = {
       f1_title: "Konsul Gizi",
       f1_desc: "Chat dokter gizi tanpa takut dihakimi. Curhat soal diet jadi lebih santai.",
       f2_title: "AI Food Scan",
-      f2_desc: "Foto makananmu! AI Gemini langsung menghitung kalori & proteinnya.",
+      f2_desc: "Foto makananmu! AI langsung menghitung kalori & proteinnya.",
       f3_title: "Smartwatch Sync",
       f3_desc: "Integrasi data langkah & detak jantung real-time dari jam tanganmu."
     },
@@ -73,7 +74,8 @@ const TRANSLATIONS = {
     }
   },
   en: {
-    nav: { home: "Home", about: "About", features: "Features", quest: "Quests", market: "Market", play: "Play Now!" },
+    // SAYA TAMBAHKAN 'community' DI SINI JUGA
+    nav: { home: "Home", about: "About", features: "Features", quest: "Quests", market: "Market", community: "Community", play: "Play Now!" },
     hero: {
       badge: "#1 Gamified Health App",
       title_1: "Prevent Malnutrition",
@@ -151,13 +153,56 @@ const AWARDS_DATA = [
   { title: "Best AI Implementation", category: "Google DevFest", img: "https://images.unsplash.com/photo-1496469888073-80de7e952517?w=400&q=80" },
 ];
 
+// --- KOMPONEN: VIDEO DEMO MODAL ---
+const DemoModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+        onClick={onClose} 
+      >
+        <motion.div 
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.5, opacity: 0 }}
+          className="relative w-full max-w-4xl bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-zimo-primary"
+          onClick={e => e.stopPropagation()} 
+        >
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full backdrop-blur-md transition"
+          >
+            <X size={24} />
+          </button>
+
+          <div className="aspect-video">
+            <video 
+              controls 
+              autoPlay 
+              className="w-full h-full object-contain"
+            >
+              {/* Pastikan file zimo-demo.mp4 ada di folder PUBLIC */}
+              <source src="/zimo-demo.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
 // --- KOMPONEN HELPER (HUD) ---
 const GameHUD = () => (
   <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mb-8 w-full max-w-lg bg-white/60 backdrop-blur-md p-3 rounded-2xl border-[3px] border-zimo-dark shadow-comic relative z-20">
     <div className="absolute -top-3 -right-3 bg-zimo-yellow border-2 border-zimo-dark rounded-full p-1 shadow-sm animate-bounce">
        <Heart size={16} className="text-zimo-red fill-zimo-red"/>
     </div>
-    {/* HP Bar */}
     <div className="flex-1 flex items-center gap-2">
       <div className="w-10 h-10 bg-zimo-red rounded-xl border-2 border-zimo-dark flex items-center justify-center text-white shadow-sm">
         <Heart size={20} fill="white" />
@@ -169,7 +214,6 @@ const GameHUD = () => (
         </div>
       </div>
     </div>
-    {/* Energy Bar */}
     <div className="flex-1 flex items-center gap-2">
       <div className="w-10 h-10 bg-zimo-yellow rounded-xl border-2 border-zimo-dark flex items-center justify-center text-zimo-dark shadow-sm">
         <Zap size={20} fill="#14532D" />
@@ -185,11 +229,9 @@ const GameHUD = () => (
 );
 
 // --- KOMPONEN: KARAKTER ZIMO (VIDEO VERSION) ---
-// Ini yang sudah diganti ke VIDEO
 const ZimoCharacter = ({ lang }) => {
   return (
     <div className="relative w-80 h-80 flex items-center justify-center">
-      {/* Speech Bubble */}
       <motion.div 
         animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 3 }}
         className="absolute -top-16 -right-10 bg-white border-[3px] border-zimo-dark px-5 py-3 rounded-2xl rounded-bl-none shadow-comic z-30"
@@ -199,20 +241,16 @@ const ZimoCharacter = ({ lang }) => {
         </p>
       </motion.div>
 
-      {/* Floating Elements (Brokoli, Apel, Love) */}
       <motion.div animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -top-10 -left-10 text-4xl drop-shadow-md z-10">🥦</motion.div>
       <motion.div animate={{ y: [0, 25, 0], rotate: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, delay: 1 }} className="absolute bottom-10 -right-12 text-4xl drop-shadow-md z-10">🍎</motion.div>
       <motion.div animate={{ scale: [1, 1.2, 1], rotate: [-10, 10, -10] }} transition={{ duration: 2, repeat: Infinity }} className="absolute top-1/2 -left-20 text-3xl z-10">💖</motion.div>
 
-      {/* CONTAINER VIDEO (Gaya Desain Zimo) */}
       <motion.div 
-        animate={{ y: [0, -15, 0] }} // Animasi Melayang Halus
+        animate={{ y: [0, -15, 0] }} 
         transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
         className="relative w-64 h-64 z-20"
       >
-        {/* Bingkai Video */}
         <div className="w-full h-full rounded-[40%] overflow-hidden border-[5px] border-zimo-dark shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.1)] bg-[#A5F3FC] relative">
-           {/* VIDEO ELEMENT */}
            <video 
              autoPlay 
              loop 
@@ -224,12 +262,8 @@ const ZimoCharacter = ({ lang }) => {
               <source src="/zimo-video.mp4" type="video/mp4" />
               Your browser does not support the video tag.
            </video>
-           
-           {/* Efek Kilau */}
            <div className="absolute top-4 right-8 w-12 h-6 bg-white opacity-30 rounded-full rotate-[-20deg] pointer-events-none"></div>
         </div>
-
-        {/* Bayangan Bawah */}
         <div className="absolute -bottom-8 left-10 right-10 h-4 bg-zimo-dark/20 rounded-[100%] blur-sm"></div>
       </motion.div>
     </div>
@@ -252,29 +286,34 @@ const SectionTitle = ({ subtitle, title, align = "center" }) => (
 
 // --- MAIN APP COMPONENT ---
 function App() {
-  const [lang, setLang] = useState('id'); // STATE UNTUK BAHASA (Default: ID)
-  const t = TRANSLATIONS[lang]; // Shortcut untuk ambil teks sesuai bahasa
+  const [lang, setLang] = useState('id'); 
+  const [isDemoOpen, setIsDemoOpen] = useState(false); 
+  const t = TRANSLATIONS[lang]; 
 
   const toggleLang = () => {
     setLang(prev => prev === 'id' ? 'en' : 'id');
   };
 
-  // FUNGSI UNTUK DOWNLOAD
   const handleDownload = () => {
     window.open(DOWNLOAD_LINK, '_blank');
+  };
+
+  // FUNGSI UNTUK LINK KOMUNITAS (BARU)
+  const handleJoinCommunity = () => {
+    window.open(TELEGRAM_LINK, '_blank');
   };
 
   return (
     <div className="font-sans text-zimo-dark bg-zimo-light min-h-screen selection:bg-zimo-primary selection:text-zimo-dark overflow-x-hidden">
       
+      <DemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
+
       {/* NAVBAR */}
       <nav className="fixed w-full z-50 top-4 px-4">
         <div className="max-w-6xl mx-auto bg-white/95 backdrop-blur-md border-[3px] border-zimo-dark rounded-full px-6 py-3 flex justify-between items-center shadow-comic">
           
-          {/* BAGIAN LOGO (SUDAH DIGANTI GAMBAR) */}
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 relative group cursor-pointer">
-               {/* Pastikan file zimo-logo.png ada di folder PUBLIC */}
                <img 
                  src="/zimo-logo.png" 
                  alt="Zimo Logo" 
@@ -294,7 +333,6 @@ function App() {
           </div>
           
           <div className="flex items-center gap-3">
-             {/* LANGUAGE TOGGLE BUTTON */}
              <button 
                 onClick={toggleLang}
                 className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-zimo-dark rounded-full font-bold hover:bg-gray-100 transition shadow-sm"
@@ -303,7 +341,6 @@ function App() {
                 <span>{lang === 'id' ? 'ID' : 'EN'}</span>
              </button>
 
-             {/* TOMBOL MAIN/DOWNLOAD DI NAVBAR */}
              <button 
                 onClick={handleDownload}
                 className="bg-zimo-yellow text-zimo-dark px-6 py-2 rounded-full font-bold border-[3px] border-zimo-dark hover:bg-yellow-300 transition shadow-[2px_2px_0px_0px_#14532D] active:translate-y-[2px] active:shadow-none hidden sm:flex items-center gap-2 group"
@@ -335,7 +372,6 @@ function App() {
               </p>
               <div className="flex flex-wrap gap-4">
                 
-                {/* TOMBOL DOWNLOAD UTAMA */}
                 <button 
                   onClick={handleDownload}
                   className="bg-zimo-primary text-zimo-dark px-8 py-4 rounded-2xl font-display font-bold text-xl border-[3px] border-zimo-dark shadow-comic hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#14532D] transition-all flex items-center gap-3 group"
@@ -343,7 +379,11 @@ function App() {
                   <Download /> {t.hero.btn_start} <Heart size={20} className="fill-zimo-dark group-hover:fill-red-500 transition-colors"/>
                 </button>
                 
-                <button className="bg-white text-zimo-dark px-8 py-4 rounded-2xl font-display font-bold text-xl border-[3px] border-zimo-dark shadow-comic hover:bg-gray-50 transition-all">
+                <button 
+                  onClick={() => setIsDemoOpen(true)}
+                  className="bg-white text-zimo-dark px-8 py-4 rounded-2xl font-display font-bold text-xl border-[3px] border-zimo-dark shadow-comic hover:bg-gray-50 transition-all flex items-center gap-2"
+                >
+                  <Play size={20} className="fill-zimo-dark"/>
                   {t.hero.btn_demo}
                 </button>
               </div>
@@ -355,12 +395,10 @@ function App() {
         </div>
       </section>
 
-      {/* WAVE SEPARATOR */}
       <div className="w-full overflow-hidden leading-[0]">
         <svg className="relative block w-[calc(100%+1.3px)] h-[80px]" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#86EFAC"></path></svg>
       </div>
 
-      {/* 2. ABOUT & PROBLEM */}
       <section id="about" className="py-24 px-6 bg-zimo-primary relative">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
             <div>
@@ -407,12 +445,10 @@ function App() {
         </div>
       </section>
 
-      {/* WAVE SEPARATOR (Inverted) */}
       <div className="w-full overflow-hidden leading-[0] rotate-180">
         <svg className="relative block w-[calc(100%+1.3px)] h-[80px]" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#86EFAC"></path></svg>
       </div>
 
-       {/* FITUR GRID (TRANSLATED) */}
        <section id="fitur" className="py-20 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <SectionTitle subtitle={t.features.badge} title={t.features.title} />
@@ -434,7 +470,6 @@ function App() {
         </div>
       </section>
 
-      {/* 3. AWARDS */}
       <section className="py-20 px-6 bg-blue-50">
          <div className="max-w-6xl mx-auto">
             <SectionTitle subtitle={t.awards.badge} title={t.awards.title} />
@@ -455,7 +490,6 @@ function App() {
          </div>
       </section>
 
-      {/* 4. MISI HARIAN */}
       <section id="misi" className="py-24 px-6 bg-yellow-50 relative overflow-hidden">
          <div className="max-w-5xl mx-auto bg-white rounded-[3rem] border-[4px] border-zimo-dark shadow-comic p-8 md:p-16 relative z-10">
             <div className="absolute -top-5 -left-5 text-6xl animate-bounce">💖</div>
@@ -492,7 +526,6 @@ function App() {
          </div>
       </section>
 
-      {/* 5. MARKETPLACE */}
       <section id="market" className="py-24 px-6 bg-zimo-light">
          <div className="max-w-6xl mx-auto">
             <div className="flex justify-between items-end mb-12">
@@ -530,7 +563,6 @@ function App() {
          </div>
       </section>
 
-      {/* 6. KOMUNITAS */}
       <section className="py-24 px-6 bg-zimo-dark text-white relative overflow-hidden">
          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ffffff 2px, transparent 2px)', backgroundSize: '24px 24px' }}></div>
          <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -539,13 +571,16 @@ function App() {
             </motion.div>
             <h2 className="text-4xl md:text-6xl font-display font-extrabold mb-6">{t.community.title}</h2>
             <p className="text-xl text-green-100 mb-10 max-w-2xl mx-auto leading-relaxed">{t.community.desc}</p>
-            <button className="bg-blue-500 text-white px-10 py-5 rounded-2xl font-bold text-xl border-[4px] border-white shadow-[8px_8px_0px_0px_#ffffff] hover:translate-y-1 hover:shadow-none transition-all flex items-center gap-3 mx-auto group">
+            {/* TOMBOL KOMUNITAS SUDAH DIGANTI LINKNYA */}
+            <button 
+               onClick={handleJoinCommunity}
+               className="bg-blue-500 text-white px-10 py-5 rounded-2xl font-bold text-xl border-[4px] border-white shadow-[8px_8px_0px_0px_#ffffff] hover:translate-y-1 hover:shadow-none transition-all flex items-center gap-3 mx-auto group"
+            >
                <Globe size={24}/> {t.community.btn_join} <Heart className="fill-white hidden group-hover:block animate-ping" size={16}/>
             </button>
          </div>
       </section>
 
-      {/* 7. BERITA */}
       <section className="py-20 px-6 bg-white border-t-[6px] border-zimo-primary">
          <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
@@ -599,12 +634,13 @@ function App() {
                <ul className="space-y-3 font-medium text-green-100">
                   <li><a href="#about" className="hover:text-white hover:underline decoration-zimo-primary underline-offset-4">{t.nav.about}</a></li>
                   <li><a href="#fitur" className="hover:text-white hover:underline decoration-zimo-primary underline-offset-4">{t.nav.features}</a></li>
+                  {/* SEKARANG SUDAH ADA MENU KOMUNITAS */}
                   <li><a href="#komunitas" className="hover:text-white hover:underline decoration-zimo-primary underline-offset-4">{t.nav.community}</a></li>
                </ul>
             </div>
          </div>
          <div className="border-t border-green-800 pt-8 text-center text-green-400 text-sm font-medium">
-            &copy; 2026 Zimo Project. All rights reserved. Made with 💖 by Your Trusted Assistant.
+            &copy; 2026 Zimo Project. All rights reserved.
          </div>
       </footer>
     </div>
